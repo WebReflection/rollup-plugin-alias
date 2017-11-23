@@ -1,0 +1,9 @@
+.nyc_output/*
+node_modules/*
+src/*
+test/*
+.DS_Store
+.gitignore
+.travis.yml
+package-lock.json
+rollup.config.js

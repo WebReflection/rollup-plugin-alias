@@ -1,99 +1,38 @@
-import path, { posix } from 'path';
-import { platform } from 'os';
 import fs from 'fs';
+import path from 'path';
 
-import slash from 'slash';
-
-const VOLUME = /^([A-Z]:)/;
-const IS_WINDOWS = platform() === 'win32';
-
-// Helper functions
-const noop = () => null;
-const matches = (key, importee) => {
-  if (importee.length < key.length) {
-    return false;
-  }
-  if (importee === key) {
-    return true;
-  }
-  const importeeStartsWithKey = (importee.indexOf(key) === 0);
-  const importeeHasSlashAfterKey = (importee.substring(key.length)[0] === '/');
-  return importeeStartsWithKey && importeeHasSlashAfterKey;
-};
-const endsWith = (needle, haystack) => haystack.slice(-needle.length) === needle;
-const isFilePath = id => /^\.?\//.test(id);
-const exists = uri => {
+const resolver = (module, entry) => {
   try {
-    return fs.statSync(uri).isFile();
-  } catch (e) {
-    return false;
-  }
+    const resolved = require.resolve(module);
+    if (resolved && resolved !== module) {
+      let base = path.dirname(resolved);
+      let i = base.split(path.sep).length;
+      while (i--) {
+        const name = path.join(base, entry);
+        if (fs.existsSync(name)) return name;
+        base = base.slice(0, base.lastIndexOf(path.sep));
+      }
+    }
+  } catch (o_O) {}
+  throw new Error(`Unable to resolve ${module}`);
 };
 
-const normalizeId = id => {
-  if ((IS_WINDOWS && typeof id === 'string') || VOLUME.test(id)) {
-    return slash(id.replace(VOLUME, ''));
+const cdns = [{
+  name: 'unpkg.com',
+  matches(id) {
+    return /https:\/\/unpkg\.com\/([^@]+?)@[^/]+?\/(.+)$/.test(id);
+  },
+  resolve(/* id */) {
+    // you could use this.matches(id) too
+    return resolver(RegExp.$1, RegExp.$2);
   }
+}];
 
-  return id;
-};
-
-export default function alias(options = {}) {
-  const hasResolve = Array.isArray(options.resolve);
-  const resolve = hasResolve ? options.resolve : ['.js'];
-  const aliasKeys = hasResolve ?
-                      Object.keys(options).filter(k => k !== 'resolve') : Object.keys(options);
-
-  // No aliases?
-  if (!aliasKeys.length) {
-    return {
-      resolveId: noop,
-    };
-  }
-
+export default function cdn() {
   return {
-    resolveId(importee, importer) {
-      const importeeId = normalizeId(importee);
-      const importerId = normalizeId(importer);
-
-      // First match is supposed to be the correct one
-      const toReplace = aliasKeys.find(key => matches(key, importeeId));
-
-      if (!toReplace || !importerId) {
-        return null;
-      }
-
-      const entry = options[toReplace];
-
-      let updatedId = normalizeId(importeeId.replace(toReplace, entry));
-
-      if (isFilePath(updatedId)) {
-        const directory = posix.dirname(importerId);
-
-        // Resolve file names
-        const filePath = posix.resolve(directory, updatedId);
-        const match = resolve.map(ext => (endsWith(ext, filePath) ? filePath : `${filePath}${ext}`))
-                            .find(exists);
-
-        if (match) {
-          updatedId = match;
-        // To keep the previous behaviour we simply return the file path
-        // with extension
-        } else if (endsWith('.js', filePath)) {
-          updatedId = filePath;
-        } else {
-          updatedId = filePath + '.js';
-        }
-      }
-
-      // if alias is windows absoulate path return resolved path or
-      // rollup on windows will throw:
-      //  [TypeError: Cannot read property 'specifier' of undefined]
-      if (VOLUME.test(entry)) {
-        return path.resolve(updatedId);
-      }
-
-      return updatedId;
-    },
+    resolveId(id) {
+      const cdn = cdns.find(cdn => cdn.matches(id));
+      return cdn ? cdn.resolve(id) : null;
+    }
   };
 }

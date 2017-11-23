@@ -1,7 +1,5 @@
 import nonAliased from './nonAliased';
-import fancyNumber from 'fancyNumber';
-import anotherFancyNumber from './anotherFancyNumber';
-import anotherNumber from './numberFolder/anotherNumber';
-import moreNumbers from 'numberFolder/anotherNumber';
+import hyper from 'https://unpkg.com/hyperhtml@latest/esm/index.js';
 
-export default fancyNumber + anotherFancyNumber + nonAliased + anotherNumber + moreNumbers;
+export { hyper };
+export default nonAliased;
