@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-cdn",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Resolves CDN with Rollup",
   "main": "dist/rollup-plugin-cdn.js",
   "module": "dist/rollup-plugin-cdn.es2015.js",
