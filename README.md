@@ -10,8 +10,10 @@ Resolve locally all dependencies loaded through fully qualified CDN urls.
 
 ### Supported CDNs
 
-So far the only supported CDN is [unpkg.com](https://unpkg.com/#/).
-You are welcome to PR others too.
+Following the list of supported CDNs (so far).
+
+  * [unpkg.com](https://unpkg.com/#/)
+  * [rawgit.com](https://rawgit.com) (both dev and prod links)
 
 
 ### Example

@@ -4,14 +4,12 @@ import path from 'path';
 const resolver = (module, entry) => {
   try {
     const resolved = require.resolve(module);
-    if (resolved && resolved !== module) {
-      let base = path.dirname(resolved);
-      let i = base.split(path.sep).length;
-      while (i--) {
-        const name = path.join(base, entry);
-        if (fs.existsSync(name)) return name;
-        base = base.slice(0, base.lastIndexOf(path.sep));
-      }
+    let base = path.dirname(resolved);
+    let i = base.split(path.sep).length;
+    while (i--) {
+      const name = path.join(base, entry);
+      if (fs.existsSync(name)) return name;
+      base = base.slice(0, base.lastIndexOf(path.sep));
     }
   } catch (o_O) {}
   throw new Error(`Unable to resolve ${module}`);
@@ -25,6 +23,14 @@ const cdns = [{
   resolve(/* id */) {
     // you could use this.matches(id) too
     return resolver(RegExp.$1, RegExp.$2);
+  }
+}, {
+  name: 'rawgit.com',
+  matches(id) {
+    return /https:\/\/(?:cdn\.)?rawgit\.com\/[^/]+?\/([^/]+?)\/[^/]+?\/(.+)$/.test(id);
+  },
+  resolve() {
+    return resolver(RegExp.$1.toLowerCase(), RegExp.$2);
   }
 }];
 

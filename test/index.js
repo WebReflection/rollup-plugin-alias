@@ -15,7 +15,29 @@ test(t => {
   t.is(typeof result.resolveId, 'function');
 });
 
-test('hyperHTML ESM via CDN', t => {
+test('hyperHTML ESM via rawcdn', t => {
+  const result = cdn();
+
+  const resolved = result.resolveId(
+    'https://rawgit.com/WebReflection/hyperHTML/master/esm/index.js'
+  );
+
+  t.is(resolved, EXPECTED);
+
+});
+
+test('hyperHTML ESM via rawcdn prod', t => {
+  const result = cdn();
+
+  const resolved = result.resolveId(
+    'https://cdn.rawgit.com/WebReflection/hyperHTML/56b0e195/esm/index.js'
+  );
+
+  t.is(resolved, EXPECTED);
+
+});
+
+test('hyperHTML ESM via unpkg', t => {
   const result = cdn();
 
   const resolved = result.resolveId(
@@ -23,6 +45,12 @@ test('hyperHTML ESM via CDN', t => {
   );
 
   t.is(resolved, EXPECTED);
+});
+
+test('builtin package', t => {
+  const result = cdn();
+  const resolved = result.resolveId('fs');
+  t.is(resolved, null);
 });
 
 test('unknown package', t => {
