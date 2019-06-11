@@ -1,11 +1,14 @@
 # rollup-plugin-cdn
 
-[![donate](https://img.shields.io/badge/$-donate-ff69b4.svg?maxAge=2592000&style=flat)](https://github.com/WebReflection/donate)
 [![Coverage Status](https://coveralls.io/repos/github/WebReflection/rollup-plugin-cdn/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/rollup-plugin-cdn?branch=master)
 [![Build Status](https://travis-ci.org/WebReflection/rollup-plugin-cdn.svg?branch=master)](https://travis-ci.org/WebReflection/rollup-plugin-cdn)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC)
 
 Resolve locally all dependencies loaded through fully qualified CDN urls.
+
+## Deprecated
+
+Please check https://github.com/mjackson/rollup-plugin-url-resolve which is actively maintained.
 
 
 ### Supported CDNs
